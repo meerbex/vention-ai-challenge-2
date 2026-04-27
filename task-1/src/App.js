@@ -481,16 +481,16 @@ function Row({ person, rank, expanded, onToggle }) {
             <tbody>
               {person.activities.map((act, i) => (
                 <tr key={i} style={{ borderBottom: "1px solid #F3F4F6" }}>
-                  <td style={{ padding: "7px 6px", fontSize: 12, color: "#37474F", fontWeight: "500" }}>
+                  <td style={{ padding: "8px 6px", fontSize: 13, color: "#37474F", fontWeight: "500" }}>
                     {act.name}
                   </td>
-                  <td style={{ padding: "7px 6px" }}>
+                  <td style={{ padding: "8px 6px" }}>
                     <span
                       style={{
                         background: "#ECEFF1",
                         borderRadius: 10,
                         padding: "2px 8px",
-                        fontSize: 11,
+                        fontSize: 12,
                         color: "#546E7A",
                         fontWeight: "500",
                         whiteSpace: "nowrap",
@@ -499,10 +499,10 @@ function Row({ person, rank, expanded, onToggle }) {
                       {act.category}
                     </span>
                   </td>
-                  <td style={{ padding: "7px 6px", fontSize: 12, color: "#78909C", fontWeight: "500" }}>
+                  <td style={{ padding: "8px 6px", fontSize: 13, color: "#78909C", fontWeight: "500" }}>
                     {act.date}
                   </td>
-                  <td style={{ padding: "7px 6px", textAlign: "right", color: BLUE, fontWeight: "700", fontSize: 12 }}>
+                  <td style={{ padding: "8px 6px", textAlign: "right", color: BLUE, fontWeight: "700", fontSize: 13 }}>
                     +{act.points}
                   </td>
                 </tr>
