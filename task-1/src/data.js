@@ -4,7 +4,7 @@ const f = (n) => `https://randomuser.me/api/portraits/women/${n}.jpg`;
 
 export const employees = [
   {
-    id: 1, name: "Alex Johnson", title: "Senior Software Engineer", code: "US.U1.D1.G1",
+    id: 1, name: "Alex Kowalski", title: "Senior Software Engineer", code: "EU.U1.D1.G1",
     avatar: m(32), color: "#4CAF93",
     score: 536, monitors: 17, courses: 0,
     activities: [
@@ -18,8 +18,8 @@ export const employees = [
     ]
   },
   {
-    id: 2, name: "Maria Petrova", title: "Group Manager", code: "EU.U1.G3",
-    avatar: f(44), color: "#7B68EE",
+    id: 2, name: "Dmitri Volkov", title: "Group Manager", code: "EU.U1.G3",
+    avatar: m(44), color: "#7B68EE",
     score: 328, monitors: 10, courses: 0,
     activities: [
       { name: "[EDU] Leadership Workshop Q4 2025", category: "Public Speaking", date: "10-Dec-2025", points: 64 },
@@ -29,7 +29,7 @@ export const employees = [
     ]
   },
   {
-    id: 3, name: "Sophie Williams", title: "Lead QA Engineer", code: "CA.U1.D1.G1.T1",
+    id: 3, name: "Natalia Kovalenko", title: "Lead QA Engineer", code: "EU.U1.D1.G1.T1",
     avatar: f(12), color: "#26C6DA",
     score: 320, monitors: 1, courses: 7,
     activities: [
