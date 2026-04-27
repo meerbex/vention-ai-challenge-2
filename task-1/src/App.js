@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { employees, years, quarters, categories } from "./data";
 import "./App.css";
 
@@ -347,6 +347,7 @@ function Row({ person, rank, expanded, onToggle }) {
         <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
           {person.monitors > 0 && (
             <div
+              title="Presentation"
               style={{
                 display: "flex",
                 flexDirection: "column",
@@ -470,7 +471,7 @@ function Row({ person, rank, expanded, onToggle }) {
                       color: "#94A3B8",
                       fontWeight: "700",
                       letterSpacing: "0.08em",
-                      borderBottom: "1px solid #F1F5F9",
+                      borderBottom: "1px solid #E2E8F0",
                     }}
                   >
                     {h}
@@ -480,7 +481,7 @@ function Row({ person, rank, expanded, onToggle }) {
             </thead>
             <tbody>
               {person.activities.map((act, i) => (
-                <tr key={i} style={{ borderBottom: "1px solid #F8FAFC" }}>
+                <tr key={i} style={{ borderBottom: "1px solid #F1F5F9" }}>
                   <td
                     style={{
                       padding: "12px 10px",
@@ -494,10 +495,11 @@ function Row({ person, rank, expanded, onToggle }) {
                     <span
                       style={{
                         background: "#F1F5F9",
-                        borderRadius: 6,
-                        padding: "4px 10px",
-                        fontSize: 12,
+                        borderRadius: 20,
+                        padding: "3px 12px",
+                        fontSize: 13,
                         color: "#475569",
+                        whiteSpace: "nowrap",
                       }}
                     >
                       {act.category}
@@ -506,7 +508,7 @@ function Row({ person, rank, expanded, onToggle }) {
                   <td
                     style={{
                       padding: "12px 10px",
-                      fontSize: 13,
+                      fontSize: 14,
                       color: "#64748B",
                     }}
                   >
@@ -533,6 +535,113 @@ function Row({ person, rank, expanded, onToggle }) {
   );
 }
 
+// ── Date helpers for filtering ────────────────────────────────────────────────
+const MONTHS = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 };
+
+function parseDate(dateStr) {
+  // "17-Dec-2025" → Date
+  const [d, m, y] = dateStr.split("-");
+  return new Date(parseInt(y), MONTHS[m], parseInt(d));
+}
+
+function getQuarter(date) {
+  const m = date.getMonth();
+  if (m <= 2) return "Q1";
+  if (m <= 5) return "Q2";
+  if (m <= 8) return "Q3";
+  return "Q4";
+}
+
+// ── FluentDropdown — matches original ms-Dropdown open/close behavior ─────────
+function FluentDropdown({ value, onChange, options }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div ref={ref} style={{ position: "relative", display: "inline-block", flexShrink: 0 }}>
+      {/* Trigger */}
+      <div
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          height: 32,
+          padding: "0 28px 0 8px",
+          border: "1px solid rgb(55,55,55)",
+          borderRadius: open ? "2px 2px 0 0" : "2px",
+          background: "rgb(235,235,237)",
+          fontSize: 14,
+          color: "#000",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          userSelect: "none",
+          position: "relative",
+          whiteSpace: "nowrap",
+          minWidth: 100,
+          fontFamily: "inherit",
+        }}
+      >
+        {value}
+        <span style={{
+          position: "absolute", right: 8, top: "50%",
+          transform: `translateY(-50%) ${open ? "rotate(180deg)" : "rotate(0deg)"}`,
+          transition: "transform 0.15s",
+          display: "flex",
+          pointerEvents: "none",
+        }}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2.5">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </span>
+      </div>
+      {/* Panel */}
+      {open && (
+        <div style={{
+          position: "absolute",
+          top: "100%",
+          left: -1,
+          minWidth: "calc(100% + 2px)",
+          background: "rgb(235,235,237)",
+          border: "1px solid rgb(55,55,55)",
+          borderTop: "none",
+          borderRadius: "0 0 2px 2px",
+          zIndex: 1000,
+          overflow: "hidden",
+        }}>
+          {options.map((opt) => (
+            <div
+              key={opt}
+              onMouseDown={() => { onChange(opt); setOpen(false); }}
+              style={{
+                height: 36,
+                padding: "0 8px",
+                fontSize: 14,
+                color: opt === value ? "rgb(21,21,21)" : "rgb(0,0,0)",
+                background: opt === value ? "rgb(234,234,234)" : "transparent",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                fontFamily: "inherit",
+              }}
+              onMouseEnter={(e) => { if (opt !== value) e.currentTarget.style.background = "rgb(243,242,241)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = opt === value ? "rgb(234,234,234)" : "transparent"; }}
+            >
+              {opt}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── App ───────────────────────────────────────────────────────────────────────
 export default function App() {
   const [year, setYear] = useState("All Years");
@@ -541,35 +650,36 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState(null);
 
-  const filtered = useMemo(
-    () =>
-      employees.filter(
-        (e) =>
-          e.name.toLowerCase().includes(search.toLowerCase()) ||
-          e.title.toLowerCase().includes(search.toLowerCase()),
-      ),
-    [search],
-  );
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase();
+    const isFiltered = year !== "All Years" || quarter !== "All Quarters" || category !== "All Categories";
+
+    return employees
+      .map((e) => {
+        const nameMatch = !q || e.name.toLowerCase().includes(q) || e.title.toLowerCase().includes(q);
+        if (!nameMatch) return null;
+
+        if (!isFiltered) return e; // original score + all activities
+
+        // Filter recent activities by active criteria
+        let acts = e.activities;
+        if (year !== "All Years") acts = acts.filter((a) => parseDate(a.date).getFullYear().toString() === year);
+        if (quarter !== "All Quarters") acts = acts.filter((a) => getQuarter(parseDate(a.date)) === quarter);
+        if (category !== "All Categories") acts = acts.filter((a) => a.category === category);
+
+        if (acts.length === 0) return null;
+
+        const score    = acts.reduce((s, a) => s + a.points, 0);
+        const monitors = acts.filter((a) => a.category === "Public Speaking").length;
+        const courses  = acts.filter((a) => a.category === "Course").length;
+        return { ...e, activities: acts, score, monitors, courses };
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.score - a.score);
+  }, [year, quarter, category, search]);
 
   const toggle = (id) => setExpanded((prev) => (prev === id ? null : id));
 
-  // Exact values from original: dark border rgb(55,55,55), gray bg rgb(235,235,237), 2px radius, 32px height
-  const dropdownStyle = {
-    height: 32,
-    padding: "0 32px 0 12px",
-    border: "1px solid rgb(55,55,55)",
-    borderRadius: 2,
-    background: "rgb(235,235,237)",
-    fontSize: 14,
-    color: "#000",
-    appearance: "none",
-    cursor: "pointer",
-    outline: "none",
-    fontFamily: "inherit",
-    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`,
-    backgroundRepeat: "no-repeat",
-    backgroundPosition: "right 10px center",
-  };
 
   return (
     <div
@@ -581,30 +691,10 @@ export default function App() {
     >
       {/* max-width 1200 centred container */}
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
-      {/* Breadcrumb */}
-      <div style={{ padding: "14px 0 0", fontSize: 13, color: "#555" }}>
-        <span style={{ color: BLUE, cursor: "pointer" }}>Home</span>
-        {" / "}
-        <span style={{ color: BLUE, cursor: "pointer" }}>EDU</span>
-        {" / "}
-        <span style={{ color: "#333" }}>Company Leader Board 2025</span>
-      </div>
-
-      {/* Page title */}
-      <div
-        style={{
-          padding: "8px 0 20px",
-          fontSize: 28,
-          fontWeight: "700",
-          color: "#0F172A",
-        }}
-      >
-        Company Leader Board 2025
-      </div>
-
       {/* Main card */}
       <div
         style={{
+          marginTop: 28,
           marginBottom: 40,
           background: "white",
           borderRadius: 8,
@@ -636,33 +726,9 @@ export default function App() {
             flexWrap: "wrap",
           }}
         >
-          <select
-            style={dropdownStyle}
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-          >
-            {years.map((y) => (
-              <option key={y}>{y}</option>
-            ))}
-          </select>
-          <select
-            style={dropdownStyle}
-            value={quarter}
-            onChange={(e) => setQuarter(e.target.value)}
-          >
-            {quarters.map((q) => (
-              <option key={q}>{q}</option>
-            ))}
-          </select>
-          <select
-            style={dropdownStyle}
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            {categories.map((c) => (
-              <option key={c}>{c}</option>
-            ))}
-          </select>
+          <FluentDropdown value={year} onChange={setYear} options={years} />
+          <FluentDropdown value={quarter} onChange={setQuarter} options={quarters} />
+          <FluentDropdown value={category} onChange={setCategory} options={categories} />
           {/* Search: same dark border + gray bg as dropdowns */}
           <div
             style={{
@@ -693,22 +759,25 @@ export default function App() {
                 fontFamily: "inherit",
               }}
             />
+            {search && (
+              <span
+                onClick={() => setSearch("")}
+                style={{ cursor: "pointer", color: "#605e5c", fontSize: 18, lineHeight: 1, flexShrink: 0, userSelect: "none" }}
+              >×</span>
+            )}
           </div>
         </div>
 
         {/* Podium — 2nd | 1st | 3rd, flex-end so platforms all share the same base */}
-        {filtered.length >= 3 && (
-          <div
-            style={{
-              display: "flex",
-              gap: 8,
-              marginBottom: 32,
-              alignItems: "flex-end",
-            }}
-          >
-            <PodiumCard person={filtered[1]} rank={2} />
+        {filtered.length >= 1 && (
+          <div style={{ display: "flex", gap: 8, marginBottom: 32, alignItems: "flex-end" }}>
+            {filtered.length >= 2
+              ? <PodiumCard person={filtered[1]} rank={2} />
+              : <div style={{ flex: 1 }} />}
             <PodiumCard person={filtered[0]} rank={1} />
-            <PodiumCard person={filtered[2]} rank={3} />
+            {filtered.length >= 3
+              ? <PodiumCard person={filtered[2]} rank={3} />
+              : <div style={{ flex: 1 }} />}
           </div>
         )}
 
@@ -728,13 +797,23 @@ export default function App() {
         {filtered.length === 0 && (
           <div
             style={{
-              textAlign: "center",
-              padding: 48,
-              color: "#94A3B8",
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "16px 20px",
+              background: "#FBF8F4",
+              borderRadius: 8,
+              border: "1px solid #E8E2DA",
               fontSize: 14,
+              color: "#555",
             }}
           >
-            No employees found
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="#999" strokeWidth="1.5">
+              <circle cx="10" cy="10" r="8" />
+              <line x1="10" y1="6" x2="10" y2="11" />
+              <circle cx="10" cy="14" r="0.5" fill="#999" />
+            </svg>
+            No activities found matching the current filters.
           </div>
         )}
       </div>
