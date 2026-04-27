@@ -457,7 +457,13 @@ function Row({ person, rank, expanded, onToggle }) {
           >
             RECENT ACTIVITY
           </div>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
+            <colgroup>
+              <col />
+              <col style={{ width: 130 }} />
+              <col style={{ width: 130 }} />
+              <col style={{ width: 80 }} />
+            </colgroup>
             <thead>
               <tr>
                 {["ACTIVITY", "CATEGORY", "DATE", "POINTS"].map((h) => (
