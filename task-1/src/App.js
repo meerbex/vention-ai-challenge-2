@@ -446,14 +446,14 @@ function Row({ person, rank, expanded, onToggle }) {
 
       {/* Expanded: Recent Activity */}
       {expanded && (
-        <div style={{ borderTop: "1px solid #E2E8F0", padding: "12px 24px 16px" }}>
+        <div style={{ borderTop: "1px solid #E2E8F0", padding: "10px 20px 14px" }}>
           <div
             style={{
-              fontSize: 11,
-              fontWeight: "700",
-              color: "#94A3B8",
-              letterSpacing: "0.1em",
-              marginBottom: 8,
+              fontSize: 10,
+              fontWeight: "600",
+              color: "#90A4AE",
+              letterSpacing: "0.08em",
+              marginBottom: 6,
             }}
           >
             RECENT ACTIVITY
@@ -466,12 +466,12 @@ function Row({ person, rank, expanded, onToggle }) {
                     key={h}
                     style={{
                       textAlign: h === "POINTS" ? "right" : "left",
-                      padding: "4px 8px",
+                      padding: "4px 6px",
                       fontSize: 10,
-                      color: "#94A3B8",
-                      fontWeight: "700",
-                      letterSpacing: "0.08em",
-                      borderBottom: "1px solid #E2E8F0",
+                      color: "#90A4AE",
+                      fontWeight: "600",
+                      letterSpacing: "0.06em",
+                      borderBottom: "1px solid #E8EAED",
                     }}
                   >
                     {h}
@@ -481,48 +481,28 @@ function Row({ person, rank, expanded, onToggle }) {
             </thead>
             <tbody>
               {person.activities.map((act, i) => (
-                <tr key={i} style={{ borderBottom: "1px solid #F1F5F9" }}>
-                  <td
-                    style={{
-                      padding: "8px 8px",
-                      fontSize: 13,
-                      color: "#1E293B",
-                    }}
-                  >
+                <tr key={i} style={{ borderBottom: "1px solid #F3F4F6" }}>
+                  <td style={{ padding: "7px 6px", fontSize: 12, color: "#37474F" }}>
                     {act.name}
                   </td>
-                  <td style={{ padding: "8px 8px" }}>
+                  <td style={{ padding: "7px 6px" }}>
                     <span
                       style={{
-                        background: "#F1F5F9",
-                        borderRadius: 20,
-                        padding: "2px 10px",
-                        fontSize: 12,
-                        color: "#475569",
+                        background: "#ECEFF1",
+                        borderRadius: 10,
+                        padding: "2px 8px",
+                        fontSize: 11,
+                        color: "#546E7A",
                         whiteSpace: "nowrap",
                       }}
                     >
                       {act.category}
                     </span>
                   </td>
-                  <td
-                    style={{
-                      padding: "8px 8px",
-                      fontSize: 13,
-                      color: "#64748B",
-                    }}
-                  >
+                  <td style={{ padding: "7px 6px", fontSize: 12, color: "#78909C" }}>
                     {act.date}
                   </td>
-                  <td
-                    style={{
-                      padding: "8px 8px",
-                      textAlign: "right",
-                      color: BLUE,
-                      fontWeight: "700",
-                      fontSize: 13,
-                    }}
-                  >
+                  <td style={{ padding: "7px 6px", textAlign: "right", color: BLUE, fontWeight: "700", fontSize: 12 }}>
                     +{act.points}
                   </td>
                 </tr>
