@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/vention-ai-challenge-2/task-1/static/css/main.40a08e64.css",
-    "main.js": "/vention-ai-challenge-2/task-1/static/js/main.5e5249ce.js",
+    "main.css": "/vention-ai-challenge-2/task-1/static/css/main.bb94761a.css",
+    "main.js": "/vention-ai-challenge-2/task-1/static/js/main.722a3ed8.js",
     "static/js/453.4c2dec41.chunk.js": "/vention-ai-challenge-2/task-1/static/js/453.4c2dec41.chunk.js",
     "index.html": "/vention-ai-challenge-2/task-1/index.html",
-    "main.40a08e64.css.map": "/vention-ai-challenge-2/task-1/static/css/main.40a08e64.css.map",
-    "main.5e5249ce.js.map": "/vention-ai-challenge-2/task-1/static/js/main.5e5249ce.js.map",
+    "main.bb94761a.css.map": "/vention-ai-challenge-2/task-1/static/css/main.bb94761a.css.map",
+    "main.722a3ed8.js.map": "/vention-ai-challenge-2/task-1/static/js/main.722a3ed8.js.map",
     "453.4c2dec41.chunk.js.map": "/vention-ai-challenge-2/task-1/static/js/453.4c2dec41.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.40a08e64.css",
-    "static/js/main.5e5249ce.js"
+    "static/css/main.bb94761a.css",
+    "static/js/main.722a3ed8.js"
   ]
 }
