@@ -2,275 +2,527 @@ import { useState, useMemo } from "react";
 import { employees, years, quarters, categories } from "./data";
 import "./App.css";
 
-// ── Icons (Fluent UI style) ───────────────────────────────────────────────
-const MonitorIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 20 20" fill="#0078d4">
-    <path d="M2 4.5C2 3.67157 2.67157 3 3.5 3H16.5C17.3284 3 18 3.67157 18 4.5V12.5C18 13.3284 17.3284 14 16.5 14H10.5V15.5H13.5C13.7761 15.5 14 15.7239 14 16C14 16.2761 13.7761 16.5 13.5 16.5H6.5C6.22386 16.5 6 16.2761 6 16C6 15.7239 6.22386 15.5 6.5 15.5H9.5V14H3.5C2.67157 14 2 13.3284 2 12.5V4.5ZM3.5 4C3.22386 4 3 4.22386 3 4.5V12.5C3 12.7761 3.22386 13 3.5 13H16.5C16.7761 13 17 12.7761 17 12.5V4.5C17 4.22386 16.7761 4 16.5 4H3.5Z" />
+const BLUE = "#0EA5E9";
+const AMBER = "#CA8A04";
+
+// ── Icons — exact Fluent UI System Icons paths (20px regular) ────────────────
+// ic_fluent_presenter_20_regular — used for "Public Speaking"
+const PresentationIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+    <path d="M9.99878 6C11.1033 6 11.9988 5.10457 11.9988 4C11.9988 2.89543 11.1033 2 9.99878 2C8.89421 2 7.99878 2.89543 7.99878 4C7.99878 5.10457 8.89421 6 9.99878 6ZM9.99878 5C9.4465 5 8.99878 4.55228 8.99878 4C8.99878 3.44772 9.4465 3 9.99878 3C10.5511 3 10.9988 3.44772 10.9988 4C10.9988 4.55228 10.5511 5 9.99878 5ZM8.49878 8C8.22264 8 7.99878 8.22386 7.99878 8.5V9H6.99878V8.5C6.99878 7.67157 7.67035 7 8.49878 7H11.4988C12.3272 7 12.9988 7.67157 12.9988 8.5V9H11.9988V8.5C11.9988 8.22386 11.7749 8 11.4988 8H8.49878ZM6.99871 14.7842V16.5C6.99871 17.3284 7.67028 18 8.49871 18H11.4987C12.3271 18 12.9987 17.3284 12.9987 16.5V14.7842C12.9987 14.6482 13.054 14.5182 13.152 14.4239L16.8548 10.8603C17.1791 10.5482 16.9582 10 16.5081 10H3.48929C3.0392 10 2.81827 10.5482 3.14257 10.8603L6.84542 14.4239C6.94336 14.5182 6.99871 14.6482 6.99871 14.7842ZM7.99871 16.5V14.7842C7.99871 14.3764 7.83268 13.9862 7.53886 13.7034L4.72987 11H15.2675L12.4586 13.7034C12.1647 13.9862 11.9987 14.3764 11.9987 14.7842V16.5C11.9987 16.7761 11.7748 17 11.4987 17H8.49871C8.22256 17 7.99871 16.7761 7.99871 16.5Z" />
   </svg>
 );
 
-const GraduationIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 20 20" fill="#0078d4">
-    <path d="M10 2.10526L18 6.31579V12.6316C18 12.9077 17.7761 13.1316 17.5 13.1316C17.2239 13.1316 17 12.9077 17 12.6316V6.84211L10 10.5263L2 6.31579L10 2.10526ZM10 11.5789L3 7.89474V13.1579C3 15.1011 6.13401 16.8421 10 16.8421C13.866 16.8421 17 15.1011 17 13.1579V7.89474L10 11.5789Z" />
+// ic_fluent_hat_graduation_20_regular — used for "Course"
+const EducationIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+    <path d="M8.5063 3.40025C9.4313 2.86919 10.5687 2.86919 11.4937 3.40025L18.749 7.56566C18.9042 7.65482 19 7.82022 19 7.99928C19 8.17835 18.9042 8.34374 18.7489 8.4329L16 10.0111V14.4993C16 14.6319 15.9473 14.759 15.8536 14.8528L15.852 14.8544L15.8496 14.8567L15.8428 14.8634L15.8201 14.8851C15.801 14.9031 15.7741 14.9281 15.7394 14.9589C15.6701 15.0205 15.5696 15.106 15.4389 15.2071C15.1777 15.4093 14.7948 15.6754 14.2978 15.9404C13.3033 16.4708 11.8479 16.9993 10 16.9993C8.15211 16.9993 6.69675 16.4708 5.70221 15.9404C5.20518 15.6754 4.82226 15.4093 4.5611 15.2071C4.43043 15.106 4.32994 15.0205 4.26059 14.9589C4.22591 14.9281 4.19898 14.9031 4.17992 14.8851C4.07226 14.7812 4 14.653 4 14.4993V10.0111L2 8.86288V13.4993C2 13.7754 1.77614 13.9993 1.5 13.9993C1.22386 13.9993 1 13.7754 1 13.4993V7.99928C1 7.8099 1.10529 7.64508 1.26052 7.56023L8.5063 3.40025ZM11.4937 12.5982C10.5687 13.1293 9.43131 13.1293 8.50632 12.5982L5 10.5852V14.2765C5.04686 14.3161 5.10469 14.3633 5.17327 14.4164C5.39649 14.5892 5.73232 14.8232 6.17279 15.0581C7.05325 15.5277 8.34789 15.9993 10 15.9993C11.6521 15.9993 12.9467 15.5277 13.8272 15.0581C14.2677 14.8232 14.6035 14.5892 14.8267 14.4164C14.8953 14.3633 14.9531 14.3161 15 14.2765V10.5852L11.4937 12.5982ZM10.9958 4.26748C10.3791 3.91344 9.62086 3.91344 9.0042 4.26748L2.50423 7.99928L9.00421 11.731C9.62087 12.085 10.3791 12.085 10.9958 11.731L17.4958 7.99928L10.9958 4.26748Z" />
   </svg>
 );
 
-const BlueStar = ({ size = 16 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="#0078d4">
-    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+// ic_fluent_star_20_filled
+const StarFill = ({ size = 16, color = BLUE }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill={color}>
+    <path d="M9.10433 2.89923C9.47114 2.15598 10.531 2.15599 10.8978 2.89923L12.8282 6.81073L17.1448 7.43797C17.9651 7.55715 18.2926 8.56513 17.699 9.14366L14.5755 12.1883L15.3129 16.4875C15.453 17.3044 14.5956 17.9274 13.8619 17.5417L10.0011 15.5119L6.14018 17.5417C5.40655 17.9274 4.54913 17.3044 4.68924 16.4875L5.4266 12.1883L2.30308 9.14366C1.70956 8.56512 2.03708 7.55715 2.8573 7.43797L7.17389 6.81073L9.10433 2.89923Z" />
   </svg>
 );
 
-const GoldStar = ({ size = 18 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="#ffc107">
-    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-  </svg>
-);
-
+// ic_fluent_chevron_down_20_regular
 const ChevronDown = ({ rotated }) => (
-  <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"
-    style={{ transform: rotated ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
-    <path d="M15.8536 7.64645C16.0488 7.84171 16.0488 8.15829 15.8536 8.35355L10.3536 13.8536C10.1583 14.0488 9.84171 14.0488 9.64645 13.8536L4.14645 8.35355C3.95118 8.15829 3.95118 7.84171 4.14645 7.64645C4.34171 7.45118 4.65829 7.45118 4.85355 7.64645L10 12.7929L15.1464 7.64645C15.3417 7.45118 15.6583 7.45118 15.8536 7.64645Z" />
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 20 20"
+    fill="currentColor"
+    style={{
+      transform: rotated ? "rotate(180deg)" : "rotate(0deg)",
+      transition: "transform 0.2s",
+    }}
+  >
+    <path d="M15.8537 7.64582C16.0493 7.84073 16.0499 8.15731 15.855 8.35292L10.39 13.8374C10.1751 14.0531 9.82574 14.0531 9.6108 13.8374L4.14582 8.35292C3.9509 8.15731 3.95147 7.84073 4.14708 7.64582C4.34269 7.4509 4.65927 7.45147 4.85418 7.64708L10.0004 12.8117L15.1466 7.64708C15.3415 7.45147 15.6581 7.4509 15.8537 7.64582Z" />
   </svg>
 );
 
+// ic_fluent_search_20_regular
 const SearchIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 20 20" fill="#605e5c">
-    <path d="M8.5 3C5.46243 3 3 5.46243 3 8.5C3 11.5376 5.46243 14 8.5 14C9.8335 14 11.0503 13.5247 11.9968 12.7333L15.6316 16.3684C15.8269 16.5637 16.1435 16.5637 16.3387 16.3684C16.534 16.1732 16.534 15.8566 16.3387 15.6613L12.7333 11.9968C13.5247 11.0503 14 9.8335 14 8.5C14 5.46243 11.5376 3 8.5 3ZM4 8.5C4 6.01472 6.01472 4 8.5 4C10.9853 4 13 6.01472 13 8.5C13 10.9853 10.9853 13 8.5 13C6.01472 13 4 10.9853 4 8.5Z" />
+  <svg width="16" height="16" viewBox="0 0 20 20" fill="#9CA3AF">
+    <path d="M13.7291 14.4362C12.5924 15.411 11.115 16 9.5 16C5.91015 16 3 13.0899 3 9.5C3 5.91015 5.91015 3 9.5 3C13.0899 3 16 5.91015 16 9.5C16 11.115 15.411 12.5924 14.4361 13.7292L17.8535 17.1465C18.0487 17.3417 18.0487 17.6583 17.8535 17.8536C17.6799 18.0271 17.4105 18.0464 17.2156 17.9114L17.1464 17.8536L13.7291 14.4362ZM13.0196 13.7266C13.276 13.5128 13.5127 13.2761 13.7265 13.0197C14.5216 12.0659 15 10.8388 15 9.5C15 6.46243 12.5376 4 9.5 4C6.46243 4 4 6.46243 4 9.5C4 12.5376 6.46243 15 9.5 15C10.8388 15 12.0658 14.5217 13.0196 13.7266Z" />
   </svg>
 );
 
-// ── Components ─────────────────────────────────────────────────────────────
-
-function SharePointGlobalHeader() {
+// ── Podium Avatar (with colored ring border) ──────────────────────────────────
+function PodiumAvatar({ person, innerSize, borderColor }) {
+  const initials = person.name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2);
   return (
-    <div style={{
-      height: 48, background: "#323130", display: "flex", alignItems: "center",
-      padding: "0 16px", color: "white", gap: 20
-    }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="white">
-          <path d="M4 4H6V6H4V4ZM7 4H9V6H7V4ZM10 4H12V6H10V4ZM4 7H6V9H4V7ZM7 7H9V9H7V7ZM10 7H12V9H10V7ZM4 10H6V12H4V10ZM7 10H9V12H7V10ZM10 10H12V12H10V10Z" />
-        </svg>
-        <div style={{ fontWeight: "600", fontSize: 16 }}>vention</div>
-        <div style={{ width: 1, height: 20, background: "rgba(255,255,255,0.3)" }} />
-        <div style={{ fontWeight: "600", fontSize: 16 }}>SharePoint</div>
-      </div>
-      <div style={{
-        flex: 1, maxWidth: 480, height: 32, background: "white", borderRadius: 2,
-        display: "flex", alignItems: "center", padding: "0 12px", gap: 8
-      }}>
-        <SearchIcon />
-        <input placeholder="Search this site" style={{ border: "none", outline: "none", flex: 1, fontSize: 14 }} />
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 20, marginLeft: "auto" }}>
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="white"><path d="M10 2C10.5523 2 11 2.44772 11 3V3.10137C13.8117 3.51151 16 5.94595 16 8.9V14.1716L17.1505 15.3221C17.4338 15.6054 17.2333 16.0882 16.8339 16.0882H3.16612C2.76669 16.0882 2.5662 15.6054 2.84951 15.3221L4 14.1716V8.9C4 5.94595 6.18833 3.51151 9 3.10137V3C9 2.44772 9.44772 2 10 2Z" /></svg>
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="white"><path d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18ZM10 14.5C10.2761 14.5 10.5 14.7239 10.5 15C10.5 15.2761 10.2761 15.5 10 15.5C9.72386 15.5 9.5 15.2761 9.5 15C9.5 14.7239 9.72386 14.5 10 14.5ZM10 4.5C11.3807 4.5 12.5 5.61929 12.5 7C12.5 8.2435 11.5937 9.27483 10.421 9.47547L10.25 9.5V11.5C10.25 11.7761 10.0261 12 9.75 12C9.47386 12 9.25 11.7761 9.25 11.5V9C9.25 8.72386 9.47386 8.5 9.75 8.5C10.7165 8.5 11.5 7.82843 11.5 7C11.5 6.17157 10.8284 5.5 10 5.5C9.17157 5.5 8.5 6.17157 8.5 7C8.5 7.27614 8.27614 7.5 8 7.5C7.72386 7.5 7.5 7.27614 7.5 7C7.5 5.61929 8.61929 4.5 10 4.5Z" /></svg>
-        <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#0078d4", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: "600", color: "white" }}>IM</div>
-      </div>
+    <div
+      style={{
+        width: innerSize,
+        height: innerSize,
+        borderRadius: "50%",
+        border: `4px solid ${borderColor}`,
+        overflow: "hidden",
+        flexShrink: 0,
+        background: person.color || "#ccc",
+      }}
+    >
+      {person.avatar ? (
+        <img
+          src={person.avatar}
+          alt={person.name}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "white",
+            fontWeight: "700",
+            fontSize: innerSize * 0.28,
+          }}
+        >
+          {initials}
+        </div>
+      )}
     </div>
   );
 }
 
-function SharePointSiteHeader() {
-  const navItems = ["Knowledge Base", "Company Info", "News & Events", "Personal Growth", "Benefits", "Policies", "Instructions and Guides", "Locations", "Spaces"];
-  return (
-    <div style={{ background: "white", borderBottom: "1px solid #edebe9", padding: "0 24px" }}>
-      <div style={{ height: 44, display: "flex", alignItems: "center", gap: 24, fontSize: 14, color: "#323130" }}>
-        {navItems.map((item, i) => (
-          <div key={i} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
-            {item}
-            {(i === 1 || i === 2 || i === 3 || i === 7 || i === 8) && <ChevronDown />}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Avatar({ person, size = 48 }) {
+// ── Row Avatar ────────────────────────────────────────────────────────────────
+function Avatar({ person, size = 56 }) {
+  const initials = person.name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2);
   if (person.avatar) {
     return (
       <img
         src={person.avatar}
         alt={person.name}
-        style={{ width: size, height: size, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
+        style={{
+          width: size,
+          height: size,
+          borderRadius: "50%",
+          objectFit: "cover",
+          flexShrink: 0,
+        }}
       />
     );
   }
-  const initials = person.name.split(" ").map(n => n[0]).join("").slice(0, 2);
   return (
-    <div style={{
-      width: size, height: size, borderRadius: "50%",
-      background: person.color || "#ccc",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      color: "white", fontWeight: "600", fontSize: size * 0.35,
-      flexShrink: 0,
-    }}>
+    <div
+      style={{
+        width: size,
+        height: size,
+        borderRadius: "50%",
+        background: person.color || "#ccc",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "white",
+        fontWeight: "700",
+        fontSize: size * 0.33,
+        flexShrink: 0,
+      }}
+    >
       {initials}
     </div>
   );
 }
 
+// ── Podium ────────────────────────────────────────────────────────────────────
 function PodiumCard({ person, rank }) {
   const isFirst = rank === 1;
-  const badgeColors   = { 1: "#ffc107", 2: "#a19f9d", 3: "#8a8886" };
-  const podiumBg      = { 1: "#f2d16d", 2: "#d2d5d8", 3: "#d2d5d8" };
-  const ringColors    = { 1: "#ffc107", 2: "#d2d5d8", 3: "#d2d5d8" };
-  const avSize        = isFirst ? 110 : 80;
-  const podiumHeight  = isFirst ? 200 : 150;
+
+  // innerSize = content area; with 4px border each side = visual size
+  // rank1: 112 inner → 120 visual | rank2/3: 80 inner → 88 visual
+  const avInner = isFirst ? 112 : 80;
+  const avBorder = isFirst ? "#FBBF24" : "white";
+
+  const badgeCfg = {
+    1: { size: 40, bg: "#EAB308", fs: 16 }, // visually ~48 with 4px border
+    2: { size: 32, bg: "#94A3B8", fs: 13 },
+    3: { size: 32, bg: "#92400E", fs: 13 },
+  };
+
+  const blockCfg = {
+    1: { h: 160, bg: "linear-gradient(#FEF3C7, #FDE68A)" },
+    2: { h: 128, bg: "linear-gradient(#E2E8F0, #CBD5E1)" },
+    3: { h: 128, bg: "linear-gradient(#E2E8F0, #CBD5E1)" },
+  };
+
+  const scoreCfg = isFirst
+    ? {
+        bg: "#FEF9C3",
+        border: "1px solid #FDE047",
+        color: AMBER,
+        starColor: AMBER,
+      }
+    : {
+        bg: "white",
+        border: "1px solid #E2E8F0",
+        color: BLUE,
+        starColor: BLUE,
+      };
+
+  const badge = badgeCfg[rank];
+  const block = blockCfg[rank];
 
   return (
-    <div style={{
-      display: "flex", flexDirection: "column", alignItems: "center",
-      flex: 1, paddingTop: isFirst ? 0 : 60, position: "relative"
-    }}>
-      {/* Avatar with ring */}
-      <div style={{ position: "relative", marginBottom: 16 }}>
-        <div style={{
-          padding: 4, borderRadius: "50%",
-          border: `4px solid ${ringColors[rank]}`,
-          display: "inline-block", lineHeight: 0,
-        }}>
-          <Avatar person={person} size={avSize} />
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        flex: 1,
+      }}
+    >
+      {/* Avatar + rank badge */}
+      <div style={{ position: "relative", marginBottom: 12 }}>
+        <PodiumAvatar
+          person={person}
+          innerSize={avInner}
+          borderColor={avBorder}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: -2,
+            right: -2,
+            width: badge.size,
+            height: badge.size,
+            borderRadius: "50%",
+            background: badge.bg,
+            border: "4px solid white",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "white",
+            fontWeight: "700",
+            fontSize: badge.fs,
+          }}
+        >
+          {rank}
         </div>
-        {/* Rank badge */}
-        <div style={{
-          position: "absolute", bottom: 6, right: 6,
-          width: 32, height: 32, borderRadius: "50%",
-          background: badgeColors[rank],
-          display: "flex", alignItems: "center", justifyContent: "center",
-          color: "white", fontWeight: "700", fontSize: 16,
-          border: "3px solid white",
-        }}>{rank}</div>
       </div>
 
       {/* Name */}
-      <div style={{
-        fontWeight: "700", fontSize: isFirst ? 22 : 18,
-        marginBottom: 4, textAlign: "center", color: "#323130",
-      }}>
+      <div
+        style={{
+          fontWeight: "700",
+          fontSize: 20,
+          color: "#0F172A",
+          textAlign: "center",
+          padding: "0 8px",
+          marginBottom: 4,
+        }}
+      >
         {person.name}
       </div>
 
-      {/* Title */}
-      <div style={{
-        fontSize: 13, color: "#605e5c", marginBottom: 12,
-        textAlign: "center", padding: "0 10%", lineHeight: 1.4
-      }}>
+      {/* Role */}
+      <div
+        style={{
+          fontSize: 13,
+          color: "#64748B",
+          textAlign: "center",
+          padding: "0 4px",
+          marginBottom: 12,
+        }}
+      >
         {person.title} ({person.code})
       </div>
 
       {/* Score pill */}
-      <div style={{
-        display: "flex", alignItems: "center", gap: 6,
-        background: isFirst ? "#fff8e1" : "white",
-        border: `1px solid ${isFirst ? "#f2d16d" : "#edebe9"}`,
-        borderRadius: 24, padding: "6px 16px",
-        fontWeight: "700", fontSize: isFirst ? 18 : 16,
-        color: "#323130", boxShadow: "0 2px 4px rgba(0,0,0,0.04)"
-      }}>
-        {isFirst ? <GoldStar size={20} /> : <BlueStar size={18} />}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          background: scoreCfg.bg,
+          border: scoreCfg.border,
+          borderRadius: 20,
+          padding: "6px 16px",
+          fontWeight: "700",
+          fontSize: 18,
+          color: scoreCfg.color,
+        }}
+      >
+        <StarFill size={16} color={scoreCfg.starColor} />
         {person.score}
       </div>
 
-      {/* Podium platform — full width, outer-only corner radius to avoid gaps */}
-      <div style={{
-        width: "100%", height: podiumHeight,
-        background: podiumBg[rank],
-        borderRadius: rank === 2 ? "8px 0 0 0" : rank === 3 ? "0 8px 0 0" : "0 0 0 0",
-        marginTop: 20, display: "flex", alignItems: "center", justifyContent: "center",
-        overflow: "hidden"
-      }}>
-        <span style={{
-          fontSize: 120, fontWeight: "800",
-          color: "rgba(0,0,0,0.06)", userSelect: "none",
-        }}>{rank}</span>
+      {/* Platform block — only outer top corner rounded to avoid gaps between adjacent platforms */}
+      <div
+        style={{
+          width: "100%",
+          height: block.h,
+          background: block.bg,
+          borderRadius:
+            rank === 2 ? "8px 8px 0 0" : rank === 3 ? "8px 8px 0 0" : "8px 8px 0 0",
+          marginTop: 16,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <span
+          style={{
+            fontSize: 80,
+            fontWeight: "900",
+            color: "rgba(0,0,0,0.06)",
+            userSelect: "none",
+          }}
+        >
+          {rank}
+        </span>
       </div>
     </div>
   );
 }
 
+// ── Row ───────────────────────────────────────────────────────────────────────
 function Row({ person, rank, expanded, onToggle }) {
   return (
-    // Card container matching original: border radius 12px, shadow, border
-    <div style={{
-      background: "white",
-      border: "1px solid #E2E8F0",
-      borderLeft: expanded ? "3px solid #0078d4" : "1px solid #E2E8F0",
-      borderRadius: 12,
-      overflow: "hidden",
-      boxShadow: "rgba(0,0,0,0.1) 0px 1px 3px 0px",
-      transition: "border-left 0.15s",
-    }}>
-      {/* Row content — padding 20px 24px matches original row_2943a085 */}
-      <div style={{ display: "flex", alignItems: "center", padding: "20px 24px", gap: 16, cursor: "pointer" }} onClick={onToggle}>
-        <div style={{ width: 28, color: "#94A3B8", fontSize: 16, fontWeight: "700", textAlign: "center", flexShrink: 0 }}>{rank}</div>
-        <Avatar person={person} size={48} />
+    <div
+      style={{
+        background: "white",
+        border: "1px solid #E2E8F0",
+        borderLeft: expanded ? `3px solid ${BLUE}` : "1px solid #E2E8F0",
+        borderRadius: 12,
+        overflow: "hidden",
+        transition: "border-left 0.15s",
+      }}
+    >
+      {/* Main row */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          padding: "20px 24px",
+          gap: 16,
+        }}
+      >
+        {/* Rank */}
+        <div
+          style={{
+            width: 32,
+            textAlign: "center",
+            flexShrink: 0,
+            fontSize: 24,
+            fontWeight: "700",
+            color: "#94A3B8",
+          }}
+        >
+          {rank}
+        </div>
+
+        {/* Avatar */}
+        <Avatar person={person} size={56} />
+
+        {/* Name + role */}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: "600", fontSize: 15, color: "#0F172A" }}>{person.name}</div>
-          <div style={{ fontSize: 13, color: "#64748B", marginTop: 2 }}>{person.title} ({person.code})</div>
+          <div style={{ fontSize: 18, fontWeight: "700", color: "#0F172A" }}>
+            {person.name}
+          </div>
+          <div style={{ fontSize: 14, color: "#64748B", marginTop: 2 }}>
+            {person.title} ({person.code})
+          </div>
         </div>
-        {/* Icons — courses first, then monitors (matches original) */}
-        <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
-          {person.courses > 0 && (
-            <div title="Course" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, color: "#0078d4" }}>
-              <GraduationIcon />
-              <span style={{ fontSize: 11, fontWeight: "600", color: "#475569" }}>{person.courses}</span>
-            </div>
-          )}
+
+        {/* Category stat icons */}
+        <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
           {person.monitors > 0 && (
-            <div title="Public Speaking" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, color: "#0078d4" }}>
-              <MonitorIcon />
-              <span style={{ fontSize: 11, fontWeight: "600", color: "#475569" }}>{person.monitors}</span>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                color: BLUE,
+                gap: 4,
+              }}
+            >
+              <PresentationIcon />
+              <span
+                style={{ fontSize: 12, fontWeight: "600", color: "#475569" }}
+              >
+                {person.monitors}
+              </span>
+            </div>
+          )}
+          {person.courses > 0 && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                color: BLUE,
+                gap: 4,
+              }}
+            >
+              <EducationIcon />
+              <span
+                style={{ fontSize: 12, fontWeight: "600", color: "#475569" }}
+              >
+                {person.courses}
+              </span>
             </div>
           )}
         </div>
+
         {/* Vertical divider */}
-        <div style={{ width: 1, height: 40, background: "#E2E8F0", flexShrink: 0 }} />
+        <div
+          style={{ width: 1, height: 44, background: "#E2E8F0", flexShrink: 0 }}
+        />
+
         {/* TOTAL + score */}
-        <div style={{ textAlign: "right", minWidth: 80 }}>
-          <div style={{ fontSize: 10, color: "#94A3B8", fontWeight: "700", letterSpacing: "0.5px" }}>TOTAL</div>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 5, color: "#0078d4", fontWeight: "700", fontSize: 18 }}>
-            <BlueStar size={16} />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+            gap: 2,
+            minWidth: 90,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 10,
+              color: "#94A3B8",
+              fontWeight: "600",
+              letterSpacing: "0.5px",
+            }}
+          >
+            TOTAL
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              color: BLUE,
+              fontWeight: "700",
+              fontSize: 24,
+            }}
+          >
+            <StarFill size={20} color={BLUE} />
             {person.score}
           </div>
         </div>
-        {/* Expand button — circular */}
-        <button onClick={e => { e.stopPropagation(); onToggle(); }} style={{
-          background: "#F1F5F9", border: "none", borderRadius: "50%",
-          cursor: "pointer", width: 36, height: 36, flexShrink: 0,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          color: "#0078d4",
-        }}>
+
+        {/* Expand button — circular, slate-200 */}
+        <button
+          onClick={onToggle}
+          style={{
+            background: "#E2E8F0",
+            border: "none",
+            borderRadius: "50%",
+            cursor: "pointer",
+            width: 36,
+            height: 36,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
           <ChevronDown rotated={expanded} />
         </button>
       </div>
-      {/* Expanded activity panel */}
+
+      {/* Expanded: Recent Activity */}
       {expanded && (
         <div style={{ borderTop: "1px solid #F1F5F9", padding: "16px 24px" }}>
-          <div style={{ fontSize: 11, fontWeight: "700", color: "#94A3B8", letterSpacing: "0.1em", marginBottom: 14 }}>RECENT ACTIVITY</div>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: "700",
+              color: "#94A3B8",
+              letterSpacing: "0.1em",
+              marginBottom: 14,
+            }}
+          >
+            RECENT ACTIVITY
+          </div>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
-                {["ACTIVITY", "CATEGORY", "DATE", "POINTS"].map(h => (
-                  <th key={h} style={{
-                    textAlign: h === "POINTS" ? "right" : "left",
-                    padding: "6px 10px", fontSize: 11, color: "#94A3B8",
-                    fontWeight: "700", letterSpacing: "0.08em", borderBottom: "1px solid #F1F5F9",
-                  }}>{h}</th>
+                {["ACTIVITY", "CATEGORY", "DATE", "POINTS"].map((h) => (
+                  <th
+                    key={h}
+                    style={{
+                      textAlign: h === "POINTS" ? "right" : "left",
+                      padding: "6px 10px",
+                      fontSize: 11,
+                      color: "#94A3B8",
+                      fontWeight: "700",
+                      letterSpacing: "0.08em",
+                      borderBottom: "1px solid #F1F5F9",
+                    }}
+                  >
+                    {h}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {person.activities.map((act, i) => (
                 <tr key={i} style={{ borderBottom: "1px solid #F8FAFC" }}>
-                  <td style={{ padding: "12px 10px", fontSize: 14, color: "#1E293B" }}>{act.name}</td>
-                  <td style={{ padding: "12px 10px" }}>
-                    <span style={{ background: "#F1F5F9", borderRadius: 4, padding: "3px 10px", fontSize: 12, color: "#475569" }}>{act.category}</span>
+                  <td
+                    style={{
+                      padding: "12px 10px",
+                      fontSize: 14,
+                      color: "#1E293B",
+                    }}
+                  >
+                    {act.name}
                   </td>
-                  <td style={{ padding: "12px 10px", fontSize: 13, color: "#64748B" }}>{act.date}</td>
-                  <td style={{ padding: "12px 10px", textAlign: "right", color: "#0078d4", fontWeight: "700", fontSize: 14 }}>+{act.points}</td>
+                  <td style={{ padding: "12px 10px" }}>
+                    <span
+                      style={{
+                        background: "#F1F5F9",
+                        borderRadius: 6,
+                        padding: "4px 10px",
+                        fontSize: 12,
+                        color: "#475569",
+                      }}
+                    >
+                      {act.category}
+                    </span>
+                  </td>
+                  <td
+                    style={{
+                      padding: "12px 10px",
+                      fontSize: 13,
+                      color: "#64748B",
+                    }}
+                  >
+                    {act.date}
+                  </td>
+                  <td
+                    style={{
+                      padding: "12px 10px",
+                      textAlign: "right",
+                      color: BLUE,
+                      fontWeight: "700",
+                      fontSize: 14,
+                    }}
+                  >
+                    +{act.points}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -281,6 +533,7 @@ function Row({ person, rank, expanded, onToggle }) {
   );
 }
 
+// ── App ───────────────────────────────────────────────────────────────────────
 export default function App() {
   const [year, setYear] = useState("All Years");
   const [quarter, setQuarter] = useState("All Quarters");
@@ -288,89 +541,204 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState(null);
 
-  const filtered = useMemo(() =>
-    employees.filter(e =>
-      e.name.toLowerCase().includes(search.toLowerCase()) ||
-      e.title.toLowerCase().includes(search.toLowerCase())
-    ), [search]);
+  const filtered = useMemo(
+    () =>
+      employees.filter(
+        (e) =>
+          e.name.toLowerCase().includes(search.toLowerCase()) ||
+          e.title.toLowerCase().includes(search.toLowerCase()),
+      ),
+    [search],
+  );
 
-  const toggle = id => setExpanded(prev => prev === id ? null : id);
+  const toggle = (id) => setExpanded((prev) => (prev === id ? null : id));
 
-  // Exact from original: dark border rgb(55,55,55), gray bg rgb(235,235,237), 2px radius, 32px height
-  const selectStyle = {
-    height: 32, padding: "0 28px 0 10px",
-    border: "1px solid rgb(55,55,55)", borderRadius: 2,
-    background: "rgb(235,235,237)", fontSize: 14, color: "#000",
-    appearance: "none", cursor: "pointer", outline: "none",
+  // Exact values from original: dark border rgb(55,55,55), gray bg rgb(235,235,237), 2px radius, 32px height
+  const dropdownStyle = {
+    height: 32,
+    padding: "0 32px 0 12px",
+    border: "1px solid rgb(55,55,55)",
+    borderRadius: 2,
+    background: "rgb(235,235,237)",
+    fontSize: 14,
+    color: "#000",
+    appearance: "none",
+    cursor: "pointer",
+    outline: "none",
+    fontFamily: "inherit",
     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`,
-    backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center",
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "right 10px center",
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f3f2f1", color: "#323130" }}>
-      <SharePointGlobalHeader />
-      <SharePointSiteHeader />
-
-      <div style={{ padding: "20px 48px" }}>
-        {/* Breadcrumb */}
-        <div style={{ fontSize: 13, marginBottom: 12, color: "#605e5c" }}>
-          <span style={{ borderBottom: "1px solid transparent", cursor: "pointer", color: "#0078d4" }}>Home</span>
-          <span style={{ margin: "0 8px" }}>/</span>
-          <span style={{ borderBottom: "1px solid transparent", cursor: "pointer", color: "#0078d4" }}>EDU</span>
-          <span style={{ margin: "0 8px" }}>/</span>
-          <span style={{ color: "#323130" }}>Company Leader Board 2025</span>
-        </div>
-
-        <h1 style={{ fontSize: 42, fontWeight: "600", margin: "0 0 32px", color: "#323130" }}>
-          Company Leader Board 2025
-        </h1>
-
-        <div style={{
-          background: "white", borderRadius: 2, padding: "32px",
-          boxShadow: "0 1.6px 3.6px 0 rgba(0,0,0,0.13), 0 0.3px 0.9px 0 rgba(0,0,0,0.11)"
-        }}>
-          <h2 style={{ fontSize: 24, fontWeight: "600", margin: "0 0 4px" }}>Leaderboard</h2>
-          <p style={{ fontSize: 14, color: "#605e5c", marginBottom: 24 }}>Top performers based on contributions and activity</p>
-
-          {/* Filter bar — no surrounding border/bg, individual items have their own styling */}
-          <div style={{ display: "flex", gap: 12, marginBottom: 40, alignItems: "center", flexWrap: "wrap" }}>
-            <select style={selectStyle} value={year} onChange={e => setYear(e.target.value)}>{years.map(y => <option key={y}>{y}</option>)}</select>
-            <select style={selectStyle} value={quarter} onChange={e => setQuarter(e.target.value)}>{quarters.map(q => <option key={q}>{q}</option>)}</select>
-            <select style={selectStyle} value={category} onChange={e => setCategory(e.target.value)}>{categories.map(c => <option key={c}>{c}</option>)}</select>
-            <div style={{
-              flex: 1, minWidth: 200, display: "flex", alignItems: "center", gap: 8,
-              height: 32, border: "1px solid rgb(55,55,55)", borderRadius: 2,
-              padding: "0 10px", background: "rgb(235,235,237)"
-            }}>
-              <SearchIcon />
-              <input
-                placeholder="Search employee..." value={search} onChange={e => setSearch(e.target.value)}
-                style={{ border: "none", outline: "none", flex: 1, fontSize: 14, color: "#323130" }}
-              />
-            </div>
-          </div>
-
-          {filtered.length >= 3 && (
-            <div style={{ display: "flex", gap: 0, marginBottom: 48, alignItems: "flex-end" }}>
-              <PodiumCard person={filtered[1]} rank={2} />
-              <PodiumCard person={filtered[0]} rank={1} />
-              <PodiumCard person={filtered[2]} rank={3} />
-            </div>
-          )}
-
-          {/* List — flex column gap:16 matches original list_2943a085 */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {filtered.map((person, i) => (
-              <Row
-                key={person.id} person={person} rank={i + 1}
-                expanded={expanded === person.id} onToggle={() => toggle(person.id)}
-              />
-            ))}
-          </div>
-
-          {filtered.length === 0 && <div style={{ textAlign: "center", padding: 40, color: "#a19f9d" }}>No results found</div>}
-        </div>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#f3f2f1",
+        fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif",
+      }}
+    >
+      {/* max-width 1200 centred container */}
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+      {/* Breadcrumb */}
+      <div style={{ padding: "14px 0 0", fontSize: 13, color: "#555" }}>
+        <span style={{ color: BLUE, cursor: "pointer" }}>Home</span>
+        {" / "}
+        <span style={{ color: BLUE, cursor: "pointer" }}>EDU</span>
+        {" / "}
+        <span style={{ color: "#333" }}>Company Leader Board 2025</span>
       </div>
+
+      {/* Page title */}
+      <div
+        style={{
+          padding: "8px 0 20px",
+          fontSize: 28,
+          fontWeight: "700",
+          color: "#0F172A",
+        }}
+      >
+        Company Leader Board 2025
+      </div>
+
+      {/* Main card */}
+      <div
+        style={{
+          marginBottom: 40,
+          background: "white",
+          borderRadius: 8,
+          padding: "28px 28px 36px",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+        }}
+      >
+        <h2
+          style={{
+            margin: "0 0 4px",
+            fontSize: 22,
+            fontWeight: "700",
+            color: "#0F172A",
+          }}
+        >
+          Leaderboard
+        </h2>
+        <p style={{ margin: "0 0 24px", fontSize: 13, color: "#64748B" }}>
+          Top performers based on contributions and activity
+        </p>
+
+        {/* Filter bar — no surrounding border/bg, just gap between items (matches original) */}
+        <div
+          style={{
+            display: "flex",
+            gap: 12,
+            marginBottom: 36,
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <select
+            style={dropdownStyle}
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+          >
+            {years.map((y) => (
+              <option key={y}>{y}</option>
+            ))}
+          </select>
+          <select
+            style={dropdownStyle}
+            value={quarter}
+            onChange={(e) => setQuarter(e.target.value)}
+          >
+            {quarters.map((q) => (
+              <option key={q}>{q}</option>
+            ))}
+          </select>
+          <select
+            style={dropdownStyle}
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            {categories.map((c) => (
+              <option key={c}>{c}</option>
+            ))}
+          </select>
+          {/* Search: same dark border + gray bg as dropdowns */}
+          <div
+            style={{
+              flex: 1,
+              minWidth: 220,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              height: 32,
+              border: "1px solid rgb(55,55,55)",
+              borderRadius: 2,
+              padding: "0 12px",
+              background: "rgb(235,235,237)",
+            }}
+          >
+            <SearchIcon />
+            <input
+              placeholder="Search employee..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{
+                border: "none",
+                outline: "none",
+                flex: 1,
+                fontSize: 14,
+                color: "#374151",
+                background: "transparent",
+                fontFamily: "inherit",
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Podium — 2nd | 1st | 3rd, flex-end so platforms all share the same base */}
+        {filtered.length >= 3 && (
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              marginBottom: 32,
+              alignItems: "flex-end",
+            }}
+          >
+            <PodiumCard person={filtered[1]} rank={2} />
+            <PodiumCard person={filtered[0]} rank={1} />
+            <PodiumCard person={filtered[2]} rank={3} />
+          </div>
+        )}
+
+        {/* Ranked list */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {filtered.map((person, i) => (
+            <Row
+              key={person.id}
+              person={person}
+              rank={i + 1}
+              expanded={expanded === person.id}
+              onToggle={() => toggle(person.id)}
+            />
+          ))}
+        </div>
+
+        {filtered.length === 0 && (
+          <div
+            style={{
+              textAlign: "center",
+              padding: 48,
+              color: "#94A3B8",
+              fontSize: 14,
+            }}
+          >
+            No employees found
+          </div>
+        )}
+      </div>
+      </div> {/* end max-width container */}
     </div>
   );
 }
