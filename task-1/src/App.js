@@ -300,11 +300,10 @@ function Row({ person, rank, expanded, onToggle }) {
     <div
       style={{
         background: "white",
-        border: "1px solid #E2E8F0",
-        borderLeft: expanded ? `3px solid ${BLUE}` : "1px solid #E2E8F0",
+        border: expanded ? `2px solid ${BLUE}` : "1px solid #E2E8F0",
         borderRadius: 12,
         overflow: "hidden",
-        transition: "border-left 0.15s",
+        transition: "border 0.15s",
       }}
     >
       {/* Main row */}
@@ -446,7 +445,7 @@ function Row({ person, rank, expanded, onToggle }) {
 
       {/* Expanded: Recent Activity */}
       {expanded && (
-        <div style={{ borderTop: "1px solid #E2E8F0", padding: "10px 20px 14px" }}>
+        <div style={{ borderTop: "1px solid #E2E8F0", padding: "10px 20px 14px", background: "#F8F9FA" }}>
           <div
             style={{
               fontSize: 10,
